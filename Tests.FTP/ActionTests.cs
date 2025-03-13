@@ -1,7 +1,7 @@
-﻿using Apps.Appname.Actions;
-using Tests.Appname.Base;
+using Apps.FTP.Actions;
+using Tests.FTP.Base;
 
-namespace Tests.Appname;
+namespace Tests.FTP;
 
 [TestClass]
 public class ActionTests : TestBase

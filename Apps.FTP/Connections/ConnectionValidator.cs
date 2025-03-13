@@ -1,9 +1,9 @@
-﻿using Apps.Appname.Api;
+using Apps.FTP.Api;
 using Blackbird.Applications.Sdk.Common.Authentication;
 using Blackbird.Applications.Sdk.Common.Connections;
 using RestSharp;
 
-namespace Apps.Appname.Connections;
+namespace Apps.FTP.Connections;
 
 public class ConnectionValidator: IConnectionValidator
 {

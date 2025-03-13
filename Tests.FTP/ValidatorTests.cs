@@ -1,8 +1,8 @@
-using Apps.Appname.Connections;
+using Apps.FTP.Connections;
 using Blackbird.Applications.Sdk.Common.Authentication;
-using Tests.Appname.Base;
+using Tests.FTP.Base;
 
-namespace Tests.Appname;
+namespace Tests.FTP;
 
 [TestClass]
 public class ConnectionValidatorTests : TestBase
