@@ -13,7 +13,7 @@ public class ConnectionValidator: IConnectionValidator
     {
         try
         {
-            var client = new Client(authenticationCredentialsProviders);
+            var client = new FTPClient(authenticationCredentialsProviders);
 
             await client.ExecuteWithErrorHandling(new RestRequest());
 

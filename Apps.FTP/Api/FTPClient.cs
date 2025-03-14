@@ -8,9 +8,9 @@ using RestSharp;
 
 namespace Apps.FTP.Api;
 
-public class Client : BlackBirdRestClient
+public class FTPClient : BlackBirdRestClient
 {
-    public Client(IEnumerable<AuthenticationCredentialsProvider> creds) : base(new()
+    public FTPClient(IEnumerable<AuthenticationCredentialsProvider> creds) : base(new()
     {
         BaseUrl = new Uri(""),
     })
