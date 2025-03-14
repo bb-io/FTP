@@ -5,14 +5,14 @@ using Blackbird.Applications.Sdk.Common.Invocation;
 
 namespace Apps.FTP;
 
-public class Invocable : BaseInvocable
+public class FTPInvocable : BaseInvocable
 {
     protected AuthenticationCredentialsProvider[] Creds =>
         InvocationContext.AuthenticationCredentialsProviders.ToArray();
 
     protected FTPClient Client { get; }
-    public Invocable(InvocationContext invocationContext) : base(invocationContext)
+    public FTPInvocable(InvocationContext invocationContext) : base(invocationContext)
     {
-        Client = new(Creds);
+        Client = new(Creds); // TODO check for config errors.
     }
 }

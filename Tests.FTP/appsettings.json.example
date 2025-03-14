@@ -1,6 +1,9 @@
 {
-  "ConnectionDefinition": {
-    "token": ""
-  },
-  "TestFolder": "TestFiles"
+    "ConnectionDefinition": {
+        "host": "",
+        "port": 21,
+        "username": "",
+        "password": ""
+    },
+    "TestFolder": "TestFiles"
 }

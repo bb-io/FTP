@@ -8,13 +8,16 @@ public class ConnectionDefinition : IConnectionDefinition
 {
     public IEnumerable<ConnectionPropertyGroup> ConnectionPropertyGroups => new List<ConnectionPropertyGroup>
     {
-        new()
+         new ConnectionPropertyGroup
         {
-            Name = "Developer API key",
+            Name = "FTP information",
             AuthenticationType = ConnectionAuthenticationType.Undefined,
-            ConnectionProperties = new List<ConnectionProperty>
+            ConnectionProperties = new List<ConnectionProperty>()
             {
-                new(CredsNames.Token) { DisplayName = "API Token", Sensitive = true}
+                new("host"){ DisplayName = "Host" },
+                new("port"){ DisplayName = "Port"},
+                new("username"){ DisplayName = "Username"},
+                new("password"){ DisplayName = "Password", Sensitive = true },
             }
         }
     };
