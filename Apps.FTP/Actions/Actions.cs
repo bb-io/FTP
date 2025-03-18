@@ -2,8 +2,11 @@ using Apps.FTP.Models.Requests;
 using Apps.FTP.Models.Responses;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
+using Blackbird.Applications.Sdk.Common.Files;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
+using System.Net.Mime;
+using System.Threading.Tasks;
 
 namespace Apps.FTP.Actions;
 
@@ -31,7 +34,20 @@ public class Actions : FTPInvocable
     [Action("Download File", Description = "Downloads a file from the FTP server")]
     public async Task<DownloadFileResponse> DownloadFile(DownloadFileRequest downloadFileRequest)
     {
-        throw new NotImplementedException();
+        using (var stream = new MemoryStream())
+        {
+            await Client.DownloadStream(stream,downloadFileRequest.Path);
+            stream.Position = 0;
+            var mimeType = "application/octet-stream";
+
+            var fileReference = await _fileManagementClient.UploadAsync(stream, mimeType, Path.GetFileName(downloadFileRequest.Path));
+
+            return new DownloadFileResponse
+            {
+                File = fileReference
+            };
+        }
+            
     }
 
     [Action("List Directory", Description = "Lists the contents of a directory on the FTP server")]
@@ -43,24 +59,24 @@ public class Actions : FTPInvocable
     [Action("Delete File", Description = "Deletes a file from the FTP server")]
     public async Task DeleteFile(string remoteFilePath)
     {
-        throw new NotImplementedException();
+        await Client.DeleteFile(remoteFilePath);
     }
 
     [Action("Rename file", Description = "Rename a path from old to new")]
-    public void RenameFile([ActionParameter] RenameFileRequest input)
+    public async Task RenameFile([ActionParameter] RenameFileRequest input)
     {
-        throw new NotImplementedException();
+        await Client.Rename(input.OldPath, input.NewPath);
     }
 
     [Action("Create directory", Description = "Create new directory by path")]
-    public void CreateDirectory([ActionParameter] CreateDirectoryRequest input)
+    public async Task CreateDirectory([ActionParameter] CreateDirectoryRequest input)
     {
-        throw new NotImplementedException();
+        await Client.CreateDirectory(input.Path);
     }
 
     [Action("Delete directory", Description = "Delete directory by path")]
-    public void DeleteDirectory([ActionParameter] DeleteDirectoryRequest input)
+    public async Task DeleteDirectory([ActionParameter] DeleteDirectoryRequest input)
     {
-        throw new NotImplementedException();
+        await Client.DeleteDirectory(input.Path);
     }
 }
