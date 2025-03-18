@@ -21,7 +21,7 @@ public class Actions : FTPInvocable
     }
 
     [Action("Upload File", Description = "Uploads a file to the FTP server")]
-    public async Task UploadFile(UploadFileRequest uploadFileRequest)
+    public async Task UploadFile([ActionParameter] UploadFileRequest uploadFileRequest)
     {
         await Client.Connect();
         using (var file = await _fileManagementClient.DownloadAsync(uploadFileRequest.File))
@@ -32,7 +32,7 @@ public class Actions : FTPInvocable
     }
 
     [Action("Download File", Description = "Downloads a file from the FTP server")]
-    public async Task<DownloadFileResponse> DownloadFile(DownloadFileRequest downloadFileRequest)
+    public async Task<DownloadFileResponse> DownloadFile([ActionParameter] DownloadFileRequest downloadFileRequest)
     {
         await Client.Connect();
 
@@ -53,7 +53,7 @@ public class Actions : FTPInvocable
     }
 
     [Action("List Directory", Description = "Lists the contents of a directory on the FTP server")]
-    public async Task<ListDirectoryResponse> ListDirectory(ListDirectoryRequest listDirectoryRequest)
+    public async Task<ListDirectoryResponse> ListDirectory([ActionParameter]ListDirectoryRequest listDirectoryRequest)
     {
         await Client.Connect();
         var listings = await Client.GetListing(listDirectoryRequest.Path, FluentFTP.FtpListOption.Recursive);
@@ -71,7 +71,7 @@ public class Actions : FTPInvocable
     }
 
     [Action("Delete File", Description = "Deletes a file from the FTP server")]
-    public async Task DeleteFile(string remoteFilePath)
+    public async Task DeleteFile([ActionParameter] string remoteFilePath)
     {
         await Client.Connect();
 
