@@ -6,7 +6,7 @@ Blackbird is the new automation backbone for the language technology industry. B
 
 <!-- begin docs -->
 
-FTP, or Secure File Transfer Protocol, is a secure file transfer protocol that uses secure shell encryption to provide a high level of security for sending and receiving file transfers.
+FTP, or File Transfer Protocol, is a  file transfer protocol.
 To use FTP, you need to have an FTP server, where files can be uploaded, stored, and retrieved in a downloadable format. An FTP server is the type of storage location where files are stored and retrieved.
 
 ## Before setting up
@@ -21,12 +21,12 @@ Before you can connect you need to make sure that:
 2. Click _Add Connection_.
 3. Name your connection for future reference e.g. 'FTP connection'.
 4. Fill in the **Host** of your FTP server.
-5. Fill in the **Port** of your FTP server (usually it's 22).
+5. Fill in the **Port** of your FTP server (usually it's 21).
 6. Fill in the **Username** of user who has access to FTP server.
 7. Fill in the **Password** of user who has access to FTP server.
 8. Click _Connect_.
 
-![connection](image/README/connection.png)
+![connection](images/README/connection.png)
 
 ## Actions
 
@@ -48,7 +48,7 @@ Before you can connect you need to make sure that:
 
 Here is an example of how you can use the FTP app in a workflow:
 
-<!-- ![example](image/README/example.png) -->
+<!-- ![example](images/README/example.png) -->
 
 In this example, the workflow starts with the **On files created or updated** event, which triggers when any file is added or updated on FTP server. Then, the workflow uses the **Download file** action to download the file that was added/updated. In the next step we translate the file via `DeepL` and then upload the translated file to Slack channel.
 
