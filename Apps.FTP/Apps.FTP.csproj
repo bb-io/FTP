@@ -6,7 +6,7 @@
         <Nullable>enable</Nullable>
         <Product>FTP</Product>
         <Description>An FTP support app that enables seamless, secure file transfers to and from remote servers, integrating effortlessly into existing workflows.</Description>
-        <Version>1.0.2</Version>
+        <Version>1.1.2</Version>
         <AssemblyName>Apps.FTP</AssemblyName>
     </PropertyGroup>
 
