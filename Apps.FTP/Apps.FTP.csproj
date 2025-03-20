@@ -4,9 +4,9 @@
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <Product>FTP</Product>
+        <Product>FTP [Beta]</Product>
         <Description>An FTP support app that enables seamless, secure file transfers to and from remote servers, integrating effortlessly into existing workflows.</Description>
-        <Version>1.1.2</Version>
+        <Version>1.1.3</Version>
         <AssemblyName>Apps.FTP</AssemblyName>
     </PropertyGroup>
 
