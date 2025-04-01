@@ -48,11 +48,8 @@ Before you can connect you need to make sure that:
 
 Here is an example of how you can use the FTP app in a workflow:
 
-<<<<<<< HEAD
 ![example](images/README/example.png)
 
-=======
->>>>>>> main
 In this example, the workflow starts with the **On files created or updated** event, which triggers when any file is added or updated on FTP server. Then, the workflow uses the **Download file** action to download the file that was added/updated. In the next step we translate the file via `DeepL` and then upload the translated file to Slack channel.
 
 ## Eggs
