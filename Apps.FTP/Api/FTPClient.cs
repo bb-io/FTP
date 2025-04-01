@@ -19,11 +19,4 @@ public class FTPClient : AsyncFtpClient
         Credentials.UserName = authenticationCredentialsProviders.First(p => p.KeyName == "username").Value;
         Credentials.Password = authenticationCredentialsProviders.First(p => p.KeyName == "password").Value;
 }
-    //protected override Exception ConfigureErrorException(RestResponse response)
-    //{
-    //    var error = JsonConvert.DeserializeObject(response.Content);
-    //    var errorMessage = "";
-
-    //    throw new PluginApplicationException(errorMessage);
-    //}
 }
