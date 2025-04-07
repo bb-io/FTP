@@ -85,7 +85,7 @@ public class Actions : FTPInvocable
     }
 
     [Action("Delete file", Description = "Deletes a file from the FTP server")]
-    public async Task DeleteFile([ActionParameter] [Display("Remote file path"] string remoteFilePath)
+    public async Task DeleteFile([ActionParameter] [Display("Remote file path")] string remoteFilePath)
     {
         if (String.IsNullOrEmpty(remoteFilePath))
         {
