@@ -65,7 +65,7 @@ namespace Apps.FTP.Webhooks
         {
             using var client = new FTPClient(Creds);
             await client.Connect();
-            var filesInfo = await ListDirectoryFiles(client, parentFolder.Folder ?? "/", parentFolder.IncludeSubfolders ?? true);
+            var filesInfo = await ListDirectoryFiles(client, parentFolder.Folder ?? "/", parentFolder.IncludeSubfolders ?? false);
             var newFilesState = filesInfo.Select(x => $"{x.FullName}|{x.Modified}").ToList();
             if (request.Memory == null)
             {            
@@ -99,7 +99,7 @@ namespace Apps.FTP.Webhooks
         {
             using var client = new FTPClient(Creds);
             await client.Connect();
-            var filesInfo = await ListDirectoryFiles(client, parentFolder.Folder ?? "/", parentFolder.IncludeSubfolders ?? true);
+            var filesInfo = await ListDirectoryFiles(client, parentFolder.Folder ?? "/", parentFolder.IncludeSubfolders ?? false);
             var newFilesState = filesInfo.Select(x => $"{x.FullName}").ToList();
             if (request.Memory == null)
             {

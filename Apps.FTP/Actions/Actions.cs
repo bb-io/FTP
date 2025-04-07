@@ -4,8 +4,10 @@ using Apps.FTP.Models.Requests;
 using Apps.FTP.Models.Responses;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
+using Blackbird.Applications.Sdk.Common.Exceptions;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
+using FluentFTP.Exceptions;
 
 namespace Apps.FTP.Actions;
 
@@ -19,27 +21,40 @@ public class Actions : FTPInvocable
         _fileManagementClient = fileManagementClient;
     }
 
-    [Action("Upload File", Description = "Uploads a file to the FTP server")]
+    [Action("Upload file", Description = "Uploads a file to the FTP server")]
     public async Task UploadFile([ActionParameter] UploadFileRequest uploadFileRequest)
     {
         await Client.Connect();
         using (var file = await _fileManagementClient.DownloadAsync(uploadFileRequest.File))
         {
 
-            await Client.UploadStream(file, uploadFileRequest.Path);
+            await Client.UploadStream(file, $"{uploadFileRequest.Path}/{uploadFileRequest.FileName}");
         }
     }
 
-    [Action("Download File", Description = "Downloads a file from the FTP server")]
+    [Action("Download file", Description = "Downloads a file from the FTP server")]
     public async Task<DownloadFileResponse> DownloadFile([ActionParameter] DownloadFileRequest downloadFileRequest)
     {
         await Client.Connect();
 
         using (var stream = new MemoryStream())
         {
-            await Client.DownloadStream(stream,downloadFileRequest.Path);
+            try
+            {
+                await Client.DownloadStream(stream, downloadFileRequest.Path);
+            }
+            catch (ArgumentException ex)
+            {
+                throw new PluginMisconfigurationException(ex.Message);
+            }
+            
             stream.Position = 0;
             var mimeType = "application/octet-stream";
+
+            if (stream.Length == 0)
+            {
+                throw new PluginMisconfigurationException("The file cannot be found.");
+            }
 
             var fileReference = await _fileManagementClient.UploadAsync(stream, mimeType, Path.GetFileName(downloadFileRequest.Path));
 
@@ -51,7 +66,7 @@ public class Actions : FTPInvocable
             
     }
 
-    [Action("List Directory", Description = "Lists the contents of a directory on the FTP server")]
+    [Action("Search files", Description = "Searches for files in a directory on the FTP server")]
     public async Task<ListDirectoryResponse> ListDirectory([ActionParameter]ListDirectoryRequest listDirectoryRequest)
     {
         await Client.Connect();
@@ -69,34 +84,74 @@ public class Actions : FTPInvocable
         };
     }
 
-    [Action("Delete File", Description = "Deletes a file from the FTP server")]
-    public async Task DeleteFile([ActionParameter] string remoteFilePath)
+    [Action("Delete file", Description = "Deletes a file from the FTP server")]
+    public async Task DeleteFile([ActionParameter] [Display("Remote file path"] string remoteFilePath)
     {
-        await Client.Connect();
+        if (String.IsNullOrEmpty(remoteFilePath))
+        {
+            throw new PluginMisconfigurationException("Please enter a valid path");
+        }
 
-        await Client.DeleteFile(remoteFilePath);
+        await Client.Connect();
+        try
+        {
+            await Client.DeleteFile(remoteFilePath);
+        }
+        catch (FtpCommandException ex)
+        {
+
+            throw new PluginApplicationException(ex.Message);
+        }
+        
     }
 
     [Action("Rename file", Description = "Rename a path from old to new")]
     public async Task RenameFile([ActionParameter] RenameFileRequest input)
     {
         await Client.Connect();
-
-        await Client.Rename(input.OldPath, input.NewPath);
+        try
+        {
+            await Client.Rename(input.OldPath, input.NewPath);
+        }
+        catch (ArgumentException ex)
+        {
+            throw new PluginMisconfigurationException(ex.Message);
+        }
+        catch(FtpCommandException ex)
+        {
+            throw new PluginApplicationException(ex.Message);
+        }
+        
     }
 
     [Action("Create directory", Description = "Create new directory by path")]
     public async Task CreateDirectory([ActionParameter] CreateDirectoryRequest input)
     {
         await Client.Connect();
-        await Client.CreateDirectory(input.Path);
+
+        string directory;
+
+        if (input.Path==null)
+        {
+            directory = input.DirectoryName;
+        }
+        else
+        {
+            directory = $"{input.Path}/{input.DirectoryName}";
+        }
+
+        await Client.CreateDirectory(directory);
     }
 
     [Action("Delete directory", Description = "Delete directory by path")]
     public async Task DeleteDirectory([ActionParameter] DeleteDirectoryRequest input)
     {
+        if (String.IsNullOrEmpty(input.Path))
+        {
+            throw new PluginMisconfigurationException("Please enter a valid path");
+        }
         await Client.Connect();
-
+        
         await Client.DeleteDirectory(input.Path);
     }
 }
