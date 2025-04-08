@@ -15,6 +15,18 @@ public static class ErrorHandler
         {
             throw new PluginMisconfigurationException("Your FTP credentials are invalid. Please check your credentials or account status.");
         }
+        catch (ArgumentException ex)
+        {
+            throw new PluginMisconfigurationException(ex.Message);
+        }
+        catch (FtpCommandException ex)
+        {
+            throw new PluginApplicationException(ex.Message);
+        }
+        catch (FtpException ex)
+        {
+            throw new PluginApplicationException(ex.Message);
+        }
     }
 
     public static async Task<T> ExecuteWithErrorHandlingAsync<T>(Func<Task<T>> action)
@@ -26,6 +38,18 @@ public static class ErrorHandler
         catch (FtpAuthenticationException)
         {
             throw new PluginMisconfigurationException("Your FTP credentials are invalid. Please check your credentials or account status.");
+        }
+        catch (ArgumentException ex)
+        {
+            throw new PluginMisconfigurationException(ex.Message);
+        }
+        catch (FtpCommandException ex)
+        {
+            throw new PluginApplicationException(ex.Message);
+        }
+        catch (FtpException ex)
+        {
+            throw new PluginApplicationException(ex.Message);
         }
     }
 }

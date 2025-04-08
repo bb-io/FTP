@@ -8,7 +8,6 @@ using Blackbird.Applications.Sdk.Common.Actions;
 using Blackbird.Applications.Sdk.Common.Exceptions;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
-using FluentFTP.Exceptions;
 
 namespace Apps.FTP.Actions;
 
@@ -53,14 +52,7 @@ public class Actions : FTPInvocable
 
         using (var stream = new MemoryStream())
         {
-            try
-            {
-                await Client.DownloadStream(stream, downloadFileRequest.Path);
-            }
-            catch (ArgumentException ex)
-            {
-                throw new PluginMisconfigurationException(ex.Message);
-            }
+            await ErrorHandler.ExecuteWithErrorHandlingAsync(async () => await Client.DownloadStream(stream, downloadFileRequest.Path));
             
             stream.Position = 0;
             var mimeType = "application/octet-stream";
@@ -84,7 +76,7 @@ public class Actions : FTPInvocable
     public async Task<ListDirectoryResponse> ListDirectory([ActionParameter]ListDirectoryRequest listDirectoryRequest)
     {
         await ErrorHandler.ExecuteWithErrorHandlingAsync(async () => await Client.Connect());
-        var listings = await Client.GetListing(listDirectoryRequest.Path, FluentFTP.FtpListOption.Recursive);
+        var listings = await ErrorHandler.ExecuteWithErrorHandlingAsync(async () => await Client.GetListing(listDirectoryRequest.Path, FluentFTP.FtpListOption.Recursive));
 
         var items = listings.Select(i => new DirectoryItemDto()
         {
@@ -107,15 +99,7 @@ public class Actions : FTPInvocable
         }
 
         await ErrorHandler.ExecuteWithErrorHandlingAsync(async () => await Client.Connect());
-        try
-        {
-            await Client.DeleteFile(remoteFilePath);
-        }
-        catch (FtpCommandException ex)
-        {
-
-            throw new PluginApplicationException(ex.Message);
-        }
+        await ErrorHandler.ExecuteWithErrorHandlingAsync(async () => await Client.DeleteFile(remoteFilePath));
         
     }
 
@@ -123,19 +107,7 @@ public class Actions : FTPInvocable
     public async Task RenameFile([ActionParameter] RenameFileRequest input)
     {
         await ErrorHandler.ExecuteWithErrorHandlingAsync(async () => await Client.Connect());
-        try
-        {
-            await Client.Rename(input.OldPath, input.NewPath);
-        }
-        catch (ArgumentException ex)
-        {
-            throw new PluginMisconfigurationException(ex.Message);
-        }
-        catch(FtpCommandException ex)
-        {
-            throw new PluginApplicationException(ex.Message);
-        }
-        
+        await ErrorHandler.ExecuteWithErrorHandlingAsync(async () => await Client.Rename(input.OldPath, input.NewPath));
     }
 
     [Action("Create directory", Description = "Create new directory by path")]
@@ -154,7 +126,7 @@ public class Actions : FTPInvocable
             directory = $"{input.Path}/{input.DirectoryName}";
         }
 
-        await Client.CreateDirectory(directory);
+        await ErrorHandler.ExecuteWithErrorHandlingAsync(async () => await Client.CreateDirectory(directory));
     }
 
     [Action("Delete directory", Description = "Delete directory by path")]
@@ -166,6 +138,6 @@ public class Actions : FTPInvocable
         }
         await ErrorHandler.ExecuteWithErrorHandlingAsync(async () => await Client.Connect());
 
-        await Client.DeleteDirectory(input.Path);
+        await ErrorHandler.ExecuteWithErrorHandlingAsync(async () => await Client.DeleteDirectory(input.Path));
     }
 }
