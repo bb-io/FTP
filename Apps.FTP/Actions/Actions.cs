@@ -25,10 +25,23 @@ public class Actions : FTPInvocable
     public async Task UploadFile([ActionParameter] UploadFileRequest uploadFileRequest)
     {
         await Client.Connect();
+
+        string path = string.Empty; 
+        string fileName = string.Empty;
+        if (string.IsNullOrEmpty(uploadFileRequest.FileName))
+        {
+            fileName = uploadFileRequest.File.Name;
+        }
+
+        if(!string.IsNullOrEmpty(uploadFileRequest.Path))
+        {
+            path = uploadFileRequest.Path;
+        }
+
         using (var file = await _fileManagementClient.DownloadAsync(uploadFileRequest.File))
         {
 
-            await Client.UploadStream(file, $"{uploadFileRequest.Path}/{uploadFileRequest.FileName}");
+            await Client.UploadStream(file, $"{path}/{fileName}");
         }
     }
 
