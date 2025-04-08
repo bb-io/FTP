@@ -1,6 +1,7 @@
 ﻿using Apps.FTP.Api;
 using Apps.FTP.Dtos;
 using Apps.FTP.Models.Responses;
+using Apps.FTP.Utils;
 using Apps.FTP.Webhooks.Payload;
 using Apps.FTP.Webhooks.Polling.Memory;
 using Blackbird.Applications.Sdk.Common.Invocation;
@@ -18,7 +19,7 @@ namespace Apps.FTP.Webhooks
             [PollingEventParameter] ParentFolderInput parentFolder)
         {
             using var client = new FTPClient(Creds);
-            await client.Connect();
+            await ErrorHandler.ExecuteWithErrorHandlingAsync(async () => await Client.Connect());
             var directories = await ListDirectoryFolders(client, parentFolder.Folder ?? "/",
                 parentFolder.IncludeSubfolders ?? false);
 
@@ -64,8 +65,8 @@ namespace Apps.FTP.Webhooks
             )
         {
             using var client = new FTPClient(Creds);
-            await client.Connect();
-            var filesInfo = await ListDirectoryFiles(client, parentFolder.Folder ?? "/", parentFolder.IncludeSubfolders ?? true);
+            await ErrorHandler.ExecuteWithErrorHandlingAsync(async () => await Client.Connect());
+            var filesInfo = await ListDirectoryFiles(client, parentFolder.Folder ?? "/", parentFolder.IncludeSubfolders ?? false);
             var newFilesState = filesInfo.Select(x => $"{x.FullName}|{x.Modified}").ToList();
             if (request.Memory == null)
             {            
@@ -98,8 +99,8 @@ namespace Apps.FTP.Webhooks
             )
         {
             using var client = new FTPClient(Creds);
-            await client.Connect();
-            var filesInfo = await ListDirectoryFiles(client, parentFolder.Folder ?? "/", parentFolder.IncludeSubfolders ?? true);
+            await ErrorHandler.ExecuteWithErrorHandlingAsync(async () => await Client.Connect());
+            var filesInfo = await ListDirectoryFiles(client, parentFolder.Folder ?? "/", parentFolder.IncludeSubfolders ?? false);
             var newFilesState = filesInfo.Select(x => $"{x.FullName}").ToList();
             if (request.Memory == null)
             {
