@@ -1,4 +1,5 @@
 using Apps.FTP.Api;
+using Apps.FTP.Utils;
 using Blackbird.Applications.Sdk.Common.Authentication;
 using Blackbird.Applications.Sdk.Common.Connections;
 using FluentFTP;
@@ -19,7 +20,7 @@ public class ConnectionValidator: IConnectionValidator
 
                 client.Config.EncryptionMode = FtpEncryptionMode.Explicit;
                 client.Config.ValidateAnyCertificate = true;
-                await client.Connect(cancellationToken);
+                await ErrorHandler.ExecuteWithErrorHandlingAsync(async () => await client.Connect(cancellationToken));
 
                 if (client.IsConnected)
                     return new ConnectionValidationResponse

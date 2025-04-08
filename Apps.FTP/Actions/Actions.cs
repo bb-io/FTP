@@ -2,6 +2,7 @@ using Apps.FTP.Api;
 using Apps.FTP.Dtos;
 using Apps.FTP.Models.Requests;
 using Apps.FTP.Models.Responses;
+using Apps.FTP.Utils;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
 using Blackbird.Applications.Sdk.Common.Exceptions;
@@ -24,7 +25,7 @@ public class Actions : FTPInvocable
     [Action("Upload file", Description = "Uploads a file to the FTP server")]
     public async Task UploadFile([ActionParameter] UploadFileRequest uploadFileRequest)
     {
-        await Client.Connect();
+        await ErrorHandler.ExecuteWithErrorHandlingAsync(async () => await Client.Connect());
 
         string path = string.Empty; 
         string fileName = string.Empty;
@@ -48,7 +49,7 @@ public class Actions : FTPInvocable
     [Action("Download file", Description = "Downloads a file from the FTP server")]
     public async Task<DownloadFileResponse> DownloadFile([ActionParameter] DownloadFileRequest downloadFileRequest)
     {
-        await Client.Connect();
+        await ErrorHandler.ExecuteWithErrorHandlingAsync(async () => await Client.Connect());
 
         using (var stream = new MemoryStream())
         {
@@ -82,7 +83,7 @@ public class Actions : FTPInvocable
     [Action("Search files", Description = "Searches for files in a directory on the FTP server")]
     public async Task<ListDirectoryResponse> ListDirectory([ActionParameter]ListDirectoryRequest listDirectoryRequest)
     {
-        await Client.Connect();
+        await ErrorHandler.ExecuteWithErrorHandlingAsync(async () => await Client.Connect());
         var listings = await Client.GetListing(listDirectoryRequest.Path, FluentFTP.FtpListOption.Recursive);
 
         var items = listings.Select(i => new DirectoryItemDto()
@@ -105,7 +106,7 @@ public class Actions : FTPInvocable
             throw new PluginMisconfigurationException("Please enter a valid path");
         }
 
-        await Client.Connect();
+        await ErrorHandler.ExecuteWithErrorHandlingAsync(async () => await Client.Connect());
         try
         {
             await Client.DeleteFile(remoteFilePath);
@@ -121,7 +122,7 @@ public class Actions : FTPInvocable
     [Action("Rename file", Description = "Rename a path from old to new")]
     public async Task RenameFile([ActionParameter] RenameFileRequest input)
     {
-        await Client.Connect();
+        await ErrorHandler.ExecuteWithErrorHandlingAsync(async () => await Client.Connect());
         try
         {
             await Client.Rename(input.OldPath, input.NewPath);
@@ -140,7 +141,7 @@ public class Actions : FTPInvocable
     [Action("Create directory", Description = "Create new directory by path")]
     public async Task CreateDirectory([ActionParameter] CreateDirectoryRequest input)
     {
-        await Client.Connect();
+        await ErrorHandler.ExecuteWithErrorHandlingAsync(async ()=> await Client.Connect());
 
         string directory;
 
@@ -163,8 +164,8 @@ public class Actions : FTPInvocable
         {
             throw new PluginMisconfigurationException("Please enter a valid path");
         }
-        await Client.Connect();
-        
+        await ErrorHandler.ExecuteWithErrorHandlingAsync(async () => await Client.Connect());
+
         await Client.DeleteDirectory(input.Path);
     }
 }
