@@ -27,15 +27,15 @@ public class Actions : FTPInvocable
         await ErrorHandler.ExecuteWithErrorHandlingAsync(async () => await Client.Connect());
 
         string path = string.Empty; 
-        string fileName = string.Empty;
+        string fileName = uploadFileRequest.FileName; ;
         if (string.IsNullOrEmpty(uploadFileRequest.FileName))
         {
             fileName = uploadFileRequest.File.Name;
         }
 
-        if(!string.IsNullOrEmpty(uploadFileRequest.Path))
+        if (!string.IsNullOrEmpty(uploadFileRequest.Path))
         {
-            path = uploadFileRequest.Path+"/";
+            path = uploadFileRequest.Path + "/";
         }
 
         using (var file = await _fileManagementClient.DownloadAsync(uploadFileRequest.File))
