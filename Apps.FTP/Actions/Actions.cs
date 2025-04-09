@@ -35,13 +35,13 @@ public class Actions : FTPInvocable
 
         if(!string.IsNullOrEmpty(uploadFileRequest.Path))
         {
-            path = uploadFileRequest.Path;
+            path = uploadFileRequest.Path+"/";
         }
 
         using (var file = await _fileManagementClient.DownloadAsync(uploadFileRequest.File))
         {
 
-            await Client.UploadStream(file, $"{path}/{fileName}");
+            await Client.UploadStream(file, $"{path}{fileName}");
         }
     }
 
