@@ -5,6 +5,6 @@ namespace Apps.FTP.Models.Requests;
 
 public class DeleteDirectoryRequest
 {
-    [Display("Directory path")]
-    public string Path { get; set; }
+    [Display("Folder path")]
+    public string FolderId { get; set; }
 }

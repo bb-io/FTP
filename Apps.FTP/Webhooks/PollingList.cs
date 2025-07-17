@@ -6,6 +6,7 @@ using Apps.FTP.Webhooks.Payload;
 using Apps.FTP.Webhooks.Polling.Memory;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Common.Polling;
+using Blackbird.Applications.SDK.Blueprints;
 using FluentFTP;
 
 namespace Apps.FTP.Webhooks
@@ -20,7 +21,7 @@ namespace Apps.FTP.Webhooks
         {
             using var client = new FTPClient(Creds);
             await ErrorHandler.ExecuteWithErrorHandlingAsync(async () => await Client.Connect());
-            var directories = await ListDirectoryFolders(client, parentFolder.Folder ?? "/",
+            var directories = await ListDirectoryFolders(client, parentFolder.FolderId ?? "/",
                 parentFolder.IncludeSubfolders ?? false);
 
             var directoryState = directories.Select(x => x.FullName).ToList();
@@ -49,16 +50,17 @@ namespace Apps.FTP.Webhooks
                 Memory = new FTPDirectoryMemory { DirectoriesState = directoryState },
                 Result = new ListDirectoryResponse
                 {
-                    DirectoriesItems = directories.Where(x => newItems.Contains(x.FullName)).Select(x => new DirectoryItemDto
+                    Files = directories.Where(x => newItems.Contains(x.FullName)).Select(x => new DirectoryItemDto
                     {
                         Name = x.Name,
-                        Path = x.FullName
+                        FileId = x.FullName
                     })
                 }
             };
         }
-        
-        [PollingEvent("On files created or updated", "On files created or updated")]
+
+        [BlueprintEventDefinition(BlueprintEvent.FilesCreatedOrUpdated)]
+        [PollingEvent("On files updated", "Triggered when files are updated or new files are created")]
         public async Task<PollingEventResponse<FTPMemory, ChangedFilesResponse>> OnFilesAddedOrUpdated(
             PollingEventRequest<FTPMemory> request,
             [PollingEventParameter] ParentFolderInput parentFolder
@@ -66,7 +68,7 @@ namespace Apps.FTP.Webhooks
         {
             using var client = new FTPClient(Creds);
             await ErrorHandler.ExecuteWithErrorHandlingAsync(async () => await Client.Connect());
-            var filesInfo = await ListDirectoryFiles(client, parentFolder.Folder ?? "/", parentFolder.IncludeSubfolders ?? false);
+            var filesInfo = await ListDirectoryFiles(client, parentFolder.FolderId ?? "/", parentFolder.IncludeSubfolders ?? false);
             var newFilesState = filesInfo.Select(x => $"{x.FullName}|{x.Modified}").ToList();
             if (request.Memory == null)
             {            
@@ -88,7 +90,7 @@ namespace Apps.FTP.Webhooks
             {
                 FlyBird = true,
                 Memory = new FTPMemory() { FilesState = newFilesState },
-                Result = new ChangedFilesResponse() { Files = filesInfo.Where(x => changedFilesPath.Contains(x.FullName)).Select(x => new DirectoryItemDto() { Name = x.Name, Path = x.FullName }).ToList() }
+                Result = new ChangedFilesResponse() { Files = filesInfo.Where(x => changedFilesPath.Contains(x.FullName)).Select(x => new DirectoryItemDto() { Name = x.Name, FileId = x.FullName }).ToList() }
             };
         }
 
@@ -100,7 +102,7 @@ namespace Apps.FTP.Webhooks
         {
             using var client = new FTPClient(Creds);
             await ErrorHandler.ExecuteWithErrorHandlingAsync(async () => await Client.Connect());
-            var filesInfo = await ListDirectoryFiles(client, parentFolder.Folder ?? "/", parentFolder.IncludeSubfolders ?? false);
+            var filesInfo = await ListDirectoryFiles(client, parentFolder.FolderId ?? "/", parentFolder.IncludeSubfolders ?? false);
             var newFilesState = filesInfo.Select(x => $"{x.FullName}").ToList();
             if (request.Memory == null)
             {
@@ -121,7 +123,7 @@ namespace Apps.FTP.Webhooks
             {
                 FlyBird = true,
                 Memory = new FTPMemory() { FilesState = newFilesState },
-                Result = new ChangedFilesResponse() { Files = deletedItems.Select(x => new DirectoryItemDto() { Name = Path.GetFileName(x), Path = x }).ToList() }
+                Result = new ChangedFilesResponse() { Files = deletedItems.Select(x => new DirectoryItemDto() { Name = Path.GetFileName(x), FileId = x }).ToList() }
             };
         }
 

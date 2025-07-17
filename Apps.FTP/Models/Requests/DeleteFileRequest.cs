@@ -4,6 +4,6 @@ namespace Apps.FTP.Models.Requests;
 
 public class DeleteFileRequest
 {
-    [Display("Full path")]
-    public string FilePath { get; set; }
+    [Display("File path")]
+    public string FileId { get; set; }
 }

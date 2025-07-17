@@ -1,8 +1,12 @@
-﻿namespace Apps.FTP.Dtos;
+﻿using Blackbird.Applications.Sdk.Common;
+using Blackbird.Applications.SDK.Blueprints.Interfaces.FileStorage;
 
-public class DirectoryItemDto
+namespace Apps.FTP.Dtos;
+
+public class DirectoryItemDto: IDownloadFileInput
 {
     public string Name { get; set; }
 
-    public string Path { get; set; }
+    [Display("File path")]
+    public string FileId { get; set; }
 }
