@@ -83,7 +83,7 @@ public class FileActions : FTPInvocable
         var items = listings.Select(i => new DirectoryItemDto()
         {
             Name = i.Name,
-            Path = i.FullName
+            FileId = i.FullName
         });
 
         return new ListDirectoryResponse()

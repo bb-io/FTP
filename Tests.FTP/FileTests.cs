@@ -109,7 +109,7 @@ namespace Tests.FTP
             // Verify that the directory listing was retrieved from the correct path
             var directoryItems = result.Files.ToList();
             Assert.AreEqual("test.txt", directoryItems[0].Name);
-            Assert.AreEqual($"/{directoryPath}/test.txt", directoryItems[0].Path);
+            Assert.AreEqual($"/{directoryPath}/test.txt", directoryItems[0].FileId);
         }
 
         [TestMethod]

@@ -53,7 +53,7 @@ namespace Apps.FTP.Webhooks
                     Files = directories.Where(x => newItems.Contains(x.FullName)).Select(x => new DirectoryItemDto
                     {
                         Name = x.Name,
-                        Path = x.FullName
+                        FileId = x.FullName
                     })
                 }
             };
@@ -90,7 +90,7 @@ namespace Apps.FTP.Webhooks
             {
                 FlyBird = true,
                 Memory = new FTPMemory() { FilesState = newFilesState },
-                Result = new ChangedFilesResponse() { Files = filesInfo.Where(x => changedFilesPath.Contains(x.FullName)).Select(x => new DirectoryItemDto() { Name = x.Name, Path = x.FullName }).ToList() }
+                Result = new ChangedFilesResponse() { Files = filesInfo.Where(x => changedFilesPath.Contains(x.FullName)).Select(x => new DirectoryItemDto() { Name = x.Name, FileId = x.FullName }).ToList() }
             };
         }
 
@@ -123,7 +123,7 @@ namespace Apps.FTP.Webhooks
             {
                 FlyBird = true,
                 Memory = new FTPMemory() { FilesState = newFilesState },
-                Result = new ChangedFilesResponse() { Files = deletedItems.Select(x => new DirectoryItemDto() { Name = Path.GetFileName(x), Path = x }).ToList() }
+                Result = new ChangedFilesResponse() { Files = deletedItems.Select(x => new DirectoryItemDto() { Name = Path.GetFileName(x), FileId = x }).ToList() }
             };
         }
 

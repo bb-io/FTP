@@ -56,7 +56,7 @@ namespace Tests.FTP
 
             // Assert
             // Verify that the directory was deleted from the correct path
-            var directories = (await _fileActions.ListDirectory(new ListDirectoryRequest())).Files.FirstOrDefault(x => x.Path == pathToDelete);
+            var directories = (await _fileActions.ListDirectory(new ListDirectoryRequest())).Files.FirstOrDefault(x => x.FileId == pathToDelete);
             Assert.IsNull(directories);
         }
     }
