@@ -60,7 +60,7 @@ namespace Apps.FTP.Webhooks
         }
 
         [BlueprintEventDefinition(BlueprintEvent.FilesCreatedOrUpdated)]
-        [PollingEvent("On files created or updated", "On files created or updated")]
+        [PollingEvent("On files updated", "Triggered when files are updated or new files are created")]
         public async Task<PollingEventResponse<FTPMemory, ChangedFilesResponse>> OnFilesAddedOrUpdated(
             PollingEventRequest<FTPMemory> request,
             [PollingEventParameter] ParentFolderInput parentFolder

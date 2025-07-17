@@ -33,7 +33,7 @@ Before you can connect you need to make sure that:
 - **Download file** Download file from server by path.
 - **Upload file** Upload files to server by specified path.
 - **Delete file** Delete a file from server by specified path.
-- **List directory files** List files (name and full path) by specified path
+- **Search files** List files (name and full path) by specified path
 - **Rename file** Rename a file by specified path from old to new
 
 ## Folder
@@ -44,7 +44,7 @@ Before you can connect you need to make sure that:
 
 ## Events
 
-- **On files created or updated** This polling event triggers when file is created or updated on server.
+- **On files updated** Triggered when files are updated or new files are created
 - **On files deleted** This polling event triggers when file is deleted from server.
 - **On directories created** This polling event triggers when directories are created within specified time interval.
 
