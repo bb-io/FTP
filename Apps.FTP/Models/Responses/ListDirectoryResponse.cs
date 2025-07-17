@@ -5,6 +5,6 @@ namespace Apps.FTP.Models.Responses;
 
 public class ListDirectoryResponse
 {
-    [Display("Directory items")]
-    public IEnumerable<DirectoryItemDto> DirectoriesItems { get; set; }
+    [Display("Folder files")]
+    public IEnumerable<DirectoryItemDto> Files { get; set; }
 }

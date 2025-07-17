@@ -6,11 +6,12 @@
         <Nullable>enable</Nullable>
         <Product>FTP</Product>
         <Description>An FTP support app that enables seamless, secure file transfers to and from remote servers, integrating effortlessly into existing workflows.</Description>
-        <Version>1.1.8</Version>
+        <Version>1.1.9</Version>
         <AssemblyName>Apps.FTP</AssemblyName>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Blackbird.Applications.Sdk.Common" Version="2.12.0" />
+        <PackageReference Include="Blackbird.Applications.SDK.Blueprints" Version="1.0.0" />
+        <PackageReference Include="Blackbird.Applications.Sdk.Common" Version="2.13.0" />
         <PackageReference Include="Blackbird.Applications.Sdk.Utils" Version="1.0.26" />
         <PackageReference Include="FluentFTP" Version="52.1.0" />
     </ItemGroup>

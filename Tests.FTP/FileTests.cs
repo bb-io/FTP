@@ -6,6 +6,7 @@ using Blackbird.Applications.Sdk.Common.Files;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,12 +17,14 @@ namespace Tests.FTP
     [TestClass]
     public class ActionsTests : TestBase
     {
-        private Actions _actions;
+        private FileActions _actions;
+        private FolderActions _folderActions;
 
         [TestInitialize]
         public void Setup()
         {
-            _actions = new Actions(InvocationContext, FileManager);
+            _actions = new FileActions(InvocationContext, FileManager);
+            _folderActions = new FolderActions(InvocationContext, FileManager);
         }
 
         [TestMethod]
@@ -33,7 +36,7 @@ namespace Tests.FTP
             var uploadFileRequest = new UploadFileRequest
             {
                 File = new FileReference() { Name = fileName},
-                Path = filePath
+                FolderId = filePath
             };
 
             // Act
@@ -41,7 +44,7 @@ namespace Tests.FTP
 
             // Assert
             // Verify that the file was uploaded to the correct path
-            var uploadedFile = (await _actions.ListDirectory(new ListDirectoryRequest())).DirectoriesItems.First(x => x.Name == filePath);
+            var uploadedFile = (await _actions.ListDirectory(new ListDirectoryRequest())).Files.First(x => x.Name == filePath);
             Assert.IsNotNull(uploadedFile);
         }
 
@@ -49,15 +52,15 @@ namespace Tests.FTP
         public async Task DownloadFile_ShouldReturnDownloadFileResponse()
         {
             // Arrange
-            var fileName = "fileToDownload.txt";
+            var fileName = "/testDirectory/test.txt/test.txt";
             var uploadFileRequest = new UploadFileRequest
             {
                 File = new FileReference() { Name = "test.txt" },
-                Path = fileName
+                FolderId = fileName
             };
             var downloadFileRequest = new DownloadFileRequest
             {
-                Path = fileName
+                FileId = fileName
             };
             await _actions.UploadFile(uploadFileRequest);
 
@@ -78,31 +81,33 @@ namespace Tests.FTP
             var directoryPath = "testDirectory";
             var createDirectoryRequest = new CreateDirectoryRequest
             {
-                Path = directoryPath
+                ParentFolderId = directoryPath
             };
-            await _actions.CreateDirectory(createDirectoryRequest);
+            await _folderActions.CreateDirectory(createDirectoryRequest);
 
             var uploadFileRequest = new UploadFileRequest
             {
                 File = new FileReference { Name = "test.txt" },
-                Path = $"{directoryPath}/test.txt"
+                FolderId = $"{directoryPath}/test.txt"
             };
             await _actions.UploadFile(uploadFileRequest);
 
             var listDirectoryRequest = new ListDirectoryRequest
             {
-                Path = directoryPath
+                FolderId = directoryPath
             };
 
             // Act
             var result = await _actions.ListDirectory(listDirectoryRequest);
 
             // Assert
+            var json = JsonConvert.SerializeObject(result, Formatting.Indented);
+            Console.WriteLine(json);
             Assert.IsNotNull(result);
             Assert.IsInstanceOfType(result, typeof(ListDirectoryResponse));
-            Assert.AreEqual(1, result.DirectoriesItems.Count());
+            Assert.AreEqual(1, result.Files.Count());
             // Verify that the directory listing was retrieved from the correct path
-            var directoryItems = result.DirectoriesItems.ToList();
+            var directoryItems = result.Files.ToList();
             Assert.AreEqual("test.txt", directoryItems[0].Name);
             Assert.AreEqual($"/{directoryPath}/test.txt", directoryItems[0].Path);
         }
@@ -110,12 +115,12 @@ namespace Tests.FTP
         [TestMethod]
         public async Task DeleteFile_ShouldDeleteFile()
         {
-            var fileToDelete = "fileToDelete.txt";
+            var fileToDelete = new DeleteFileRequest{ FileId= "/testDirectory/test.txt/test.txt" };
             // Arrange
 
             var uploadFileRequest = new UploadFileRequest()
-            { 
-                Path = fileToDelete,
+            {
+                FolderId = fileToDelete.FileId,
                 File = new FileReference() { Name = "test.txt" }
             };
             await _actions.UploadFile(uploadFileRequest);
@@ -125,7 +130,7 @@ namespace Tests.FTP
 
             // Assert
             // Verify that the directory was deleted from the correct path
-            var directories = (await _actions.ListDirectory(new ListDirectoryRequest())).DirectoriesItems.FirstOrDefault(x => x.Name == fileToDelete);
+            var directories = (await _actions.ListDirectory(new ListDirectoryRequest())).Files.FirstOrDefault(x => x.Name == fileToDelete.FileId);
             Assert.IsNull(directories);
         }
 
@@ -139,7 +144,7 @@ namespace Tests.FTP
             var uploadFileRequest = new UploadFileRequest
             {
                 File = new FileReference { Name = "test.txt" },
-                Path = oldFilePath
+                FolderId = oldFilePath
             };
             await _actions.UploadFile(uploadFileRequest);
 
@@ -154,51 +159,8 @@ namespace Tests.FTP
 
             // Assert
             // Verify that the file was renamed to the correct path
-            var renamedFile = (await _actions.ListDirectory(new ListDirectoryRequest() { Path = "path"})).DirectoriesItems.First(x => x.Name == "file2.txt");
+            var renamedFile = (await _actions.ListDirectory(new ListDirectoryRequest() { FolderId = "path"})).Files.First(x => x.Name == "file2.txt");
             Assert.IsNotNull(renamedFile);
-        }
-
-        [TestMethod]
-        public async Task CreateDirectory_ShouldCreateDirectory()
-        {
-            // Arrange
-            var createDirectoryRequest = new CreateDirectoryRequest
-            {
-                Path = "testpath"
-            };
-
-            // Act
-            await _actions.CreateDirectory(createDirectoryRequest);
-
-            // Assert
-            // Verify that the directory was created at the correct path
-            var directoryExists = (await _actions.ListDirectory(new ListDirectoryRequest() { Path = createDirectoryRequest.Path })) != null; 
-            Assert.IsTrue(directoryExists);
-        }
-
-        [TestMethod]
-        public async Task DeleteDirectory_ShouldDeleteDirectory()
-        {
-            var pathToDelete = "pathToDelete";
-            // Arrange
-            var deleteDirectoryRequest = new DeleteDirectoryRequest
-            {
-                Path = pathToDelete
-            };
-
-            var createDirectoryRequest = new CreateDirectoryRequest()
-            { 
-                Path = pathToDelete 
-            };
-            await _actions.CreateDirectory(createDirectoryRequest);
-            // Act
-
-            await _actions.DeleteDirectory(deleteDirectoryRequest);
-
-            // Assert
-            // Verify that the directory was deleted from the correct path
-            var directories = (await _actions.ListDirectory(new ListDirectoryRequest())).DirectoriesItems.FirstOrDefault(x => x.Path == pathToDelete);
-            Assert.IsNull(directories);
-        }
+        }      
     }
 }

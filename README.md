@@ -28,15 +28,19 @@ Before you can connect you need to make sure that:
 
 ![connection](images/README/connection.png)
 
-## Actions
+## File
 
 - **Download file** Download file from server by path.
 - **Upload file** Upload files to server by specified path.
 - **Delete file** Delete a file from server by specified path.
-- **Create directory** Create new directory by specified path.
-- **Delete directory** Delete directory from server by specified path.
 - **List directory files** List files (name and full path) by specified path
 - **Rename file** Rename a file by specified path from old to new
+
+## Folder
+
+- **Create folder** Create new directory by specified path.
+- **Delete folder** Delete directory from server by specified path.
+
 
 ## Events
 

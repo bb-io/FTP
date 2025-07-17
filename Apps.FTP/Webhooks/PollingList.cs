@@ -6,6 +6,7 @@ using Apps.FTP.Webhooks.Payload;
 using Apps.FTP.Webhooks.Polling.Memory;
 using Blackbird.Applications.Sdk.Common.Invocation;
 using Blackbird.Applications.Sdk.Common.Polling;
+using Blackbird.Applications.SDK.Blueprints;
 using FluentFTP;
 
 namespace Apps.FTP.Webhooks
@@ -20,7 +21,7 @@ namespace Apps.FTP.Webhooks
         {
             using var client = new FTPClient(Creds);
             await ErrorHandler.ExecuteWithErrorHandlingAsync(async () => await Client.Connect());
-            var directories = await ListDirectoryFolders(client, parentFolder.Folder ?? "/",
+            var directories = await ListDirectoryFolders(client, parentFolder.FolderId ?? "/",
                 parentFolder.IncludeSubfolders ?? false);
 
             var directoryState = directories.Select(x => x.FullName).ToList();
@@ -49,7 +50,7 @@ namespace Apps.FTP.Webhooks
                 Memory = new FTPDirectoryMemory { DirectoriesState = directoryState },
                 Result = new ListDirectoryResponse
                 {
-                    DirectoriesItems = directories.Where(x => newItems.Contains(x.FullName)).Select(x => new DirectoryItemDto
+                    Files = directories.Where(x => newItems.Contains(x.FullName)).Select(x => new DirectoryItemDto
                     {
                         Name = x.Name,
                         Path = x.FullName
@@ -57,7 +58,8 @@ namespace Apps.FTP.Webhooks
                 }
             };
         }
-        
+
+        [BlueprintEventDefinition(BlueprintEvent.FilesCreatedOrUpdated)]
         [PollingEvent("On files created or updated", "On files created or updated")]
         public async Task<PollingEventResponse<FTPMemory, ChangedFilesResponse>> OnFilesAddedOrUpdated(
             PollingEventRequest<FTPMemory> request,
@@ -66,7 +68,7 @@ namespace Apps.FTP.Webhooks
         {
             using var client = new FTPClient(Creds);
             await ErrorHandler.ExecuteWithErrorHandlingAsync(async () => await Client.Connect());
-            var filesInfo = await ListDirectoryFiles(client, parentFolder.Folder ?? "/", parentFolder.IncludeSubfolders ?? false);
+            var filesInfo = await ListDirectoryFiles(client, parentFolder.FolderId ?? "/", parentFolder.IncludeSubfolders ?? false);
             var newFilesState = filesInfo.Select(x => $"{x.FullName}|{x.Modified}").ToList();
             if (request.Memory == null)
             {            
@@ -100,7 +102,7 @@ namespace Apps.FTP.Webhooks
         {
             using var client = new FTPClient(Creds);
             await ErrorHandler.ExecuteWithErrorHandlingAsync(async () => await Client.Connect());
-            var filesInfo = await ListDirectoryFiles(client, parentFolder.Folder ?? "/", parentFolder.IncludeSubfolders ?? false);
+            var filesInfo = await ListDirectoryFiles(client, parentFolder.FolderId ?? "/", parentFolder.IncludeSubfolders ?? false);
             var newFilesState = filesInfo.Select(x => $"{x.FullName}").ToList();
             if (request.Memory == null)
             {

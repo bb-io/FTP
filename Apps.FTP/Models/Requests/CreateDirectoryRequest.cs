@@ -5,9 +5,9 @@ namespace Apps.FTP.Models.Requests;
 
 public class CreateDirectoryRequest
 {
-    [Display("Directory name")]
-    public string DirectoryName { get; set; }
+    [Display("Folder name")]
+    public string FolderName { get; set; }
 
-    [Display("Parent directory path", Description = "The path, '/' being the root directory (default).")]
-    public string? Path { get; set; }
+    [Display("Parent folder path", Description = "The path, '/' being the root  (default).")]
+    public string? ParentFolderId { get; set; }
 }
