@@ -13,7 +13,7 @@ namespace Tests.FTP
         [TestInitialize]
         public void Setup()
         {
-            _actions = new FolderActions(InvocationContext, FileManager);
+            _actions = new FolderActions(InvocationContext);
             _fileActions = new FileActions(InvocationContext, FileManager);
         }
 
