@@ -1,4 +1,3 @@
-using Apps.FTP.Api;
 using Apps.FTP.Dtos;
 using Apps.FTP.Models.Requests;
 using Apps.FTP.Models.Responses;
@@ -13,15 +12,8 @@ using Blackbird.Applications.SDK.Extensions.FileManagement.Interfaces;
 namespace Apps.FTP.Actions;
 
 [ActionList("Files")]
-public class FileActions : FTPInvocable
+public class FileActions(InvocationContext invocationContext, IFileManagementClient fileManagementClient) : FTPInvocable(invocationContext)
 {
-    private readonly IFileManagementClient _fileManagementClient;
-
-    public FileActions(InvocationContext invocationContext, IFileManagementClient fileManagementClient) : base(invocationContext)
-    {
-        _fileManagementClient = fileManagementClient;
-    }
-
     [BlueprintActionDefinition(BlueprintAction.UploadFile)]
     [Action("Upload file", Description = "Uploads a file to the FTP server")]
     public async Task UploadFile([ActionParameter] UploadFileRequest uploadFileRequest)
@@ -29,7 +21,7 @@ public class FileActions : FTPInvocable
         await ErrorHandler.ExecuteWithErrorHandlingAsync(async () => await Client.Connect());
 
         string path = string.Empty; 
-        string fileName = uploadFileRequest.FileName; ;
+        string fileName = uploadFileRequest.FileName;
         if (string.IsNullOrEmpty(uploadFileRequest.FileName))
         {
             fileName = uploadFileRequest.File.Name;
@@ -40,7 +32,7 @@ public class FileActions : FTPInvocable
             path = uploadFileRequest.FolderId + "/";
         }
 
-        using (var file = await _fileManagementClient.DownloadAsync(uploadFileRequest.File))
+        using (var file = await fileManagementClient.DownloadAsync(uploadFileRequest.File))
         {
 
             await Client.UploadStream(file, $"{path}{fileName}");
@@ -65,7 +57,7 @@ public class FileActions : FTPInvocable
                 throw new PluginMisconfigurationException("The file cannot be found.");
             }
 
-            var fileReference = await _fileManagementClient.UploadAsync(stream, mimeType, Path.GetFileName(downloadFileRequest.FileId));
+            var fileReference = await fileManagementClient.UploadAsync(stream, mimeType, Path.GetFileName(downloadFileRequest.FileId));
 
             return new DownloadFileResponse
             {
